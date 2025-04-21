@@ -100,20 +100,21 @@ class Playable:
         file_path = library.joinpath(output).expanduser()
         check_path = Path(file_path)
         if check_path.exists():
-            f = LocalFile(check_path)
-            f_spotid = None
+            print("File exists. TODO: check if spotid is the same")
+            raise FileExistsError("File already downloaded")
+            # f = LocalFile(check_path)
+            # f_spotid = None
 
-            try:
-                f_spotid = f.get_metadata("spotid")
-            except IndexError:
-                pass
+            # try:
+            #     f_spotid = f.get_metadata("spotid")
+            # except IndexError:
+            #     pass
 
-            if f_spotid != spotid:
-                file_path = Path(f"{file_path} (SpotId-{spotid[-5:]})")
-            else:
-                if not replace:
-                    raise FileExistsError("File already downloaded")
-
+            # if f_spotid != spotid:
+            #     file_path = Path(f"{file_path} (SpotId:{spotid[-5:]})")
+            # else:
+            #     if not replace:
+            #         raise FileExistsError("File already downloaded")
         else:
             file_path.parent.mkdir(parents=True, exist_ok=True)
 
