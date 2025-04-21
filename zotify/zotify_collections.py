@@ -8,10 +8,10 @@ from librespot.metadata import (
     ShowId,
 )
 
-from zotify import ApiClient, API_MAX_REQUEST_LIMIT
-from zotify.config import Config
-from zotify.file import LocalFile
-from zotify.utils import (
+from misc import ApiClient, API_MAX_REQUEST_LIMIT
+from config import Config
+from file import LocalFile
+from utils import (
     MetadataEntry,
     PlayableData,
     PlayableType,
