@@ -57,6 +57,24 @@ class Lyrics:
                 f.writelines(self.__lines[:-1])
 
 
+def spotid_exists(directory: Path | str, spotid: str) -> bool:
+    """
+    Checks if a file with the same spotid already exists in the directory
+    Args:
+        directory: Path to root content library
+        spotid: SpotId of the track
+    Returns:
+        True if file exists, False otherwise
+    """
+    if not isinstance(directory, Path):
+        directory = Path(directory)
+    
+    spotid_file = directory / "all_spotids.txt"
+    if spotid_file.exists():
+        with open(spotid_file, "r", encoding="utf-8") as f:
+            return spotid in f.read().splitlines()
+    return False
+
 class Playable:
     cover_images: list[Metadata.Image]
     input_stream: GeneralAudioStream
@@ -95,6 +113,14 @@ class Playable:
 
             if meta.name == "spotid":
                 spotid = meta.string
+
+        if spotid_exists(library, spotid):
+            print("Spotid already exists in all_spotids.txt")
+            raise FileExistsError("Spotid already downloaded")
+        
+        spotid_file = library / "all_spotids.txt"
+        with open(spotid_file, "a", encoding="utf-8") as f:
+            f.write(f"{spotid}\n")
 
         output = f"{output}.{ext}"
         file_path = library.joinpath(output).expanduser()
