@@ -2,7 +2,7 @@ from argparse import Namespace
 from pathlib import Path
 from typing import Any
 
-from zotify import OAuth, Session
+from misc import OAuth, Session
 from zotify.collections import Album, Artist, Collection, Episode, Playlist, Show, Track
 from zotify.config import Config
 from zotify.file import TranscodingError
