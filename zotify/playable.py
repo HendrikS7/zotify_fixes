@@ -96,8 +96,9 @@ class Playable:
             if meta.name == "spotid":
                 spotid = meta.string
 
+        output = f"{output}.{ext}"
         file_path = library.joinpath(output).expanduser()
-        check_path = Path(f"{file_path}.{ext}")
+        check_path = Path(file_path)
         if check_path.exists():
             f = LocalFile(check_path)
             f_spotid = None
