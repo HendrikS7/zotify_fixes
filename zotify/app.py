@@ -3,13 +3,12 @@ from pathlib import Path
 from typing import Any
 
 from misc import OAuth, Session
-from zotify.collections import Album, Artist, Collection, Episode, Playlist, Show, Track
-from zotify.config import Config
-from zotify.file import TranscodingError
-from zotify.loader import Loader
-from zotify.logger import LogChannel, Logger
-from zotify.utils import AudioFormat, PlayableType
-
+from zotify_collections import Album, Artist, Collection, Episode, Playlist, Show, Track
+from config import Config
+from file import TranscodingError
+from loader import Loader
+from logger import LogChannel, Logger
+from utils import AudioFormat, PlayableType
 
 class ParseError(ValueError): ...
 

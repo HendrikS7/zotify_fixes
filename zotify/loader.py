@@ -8,7 +8,7 @@ from sys import platform as PLATFORM
 from threading import Thread
 from time import sleep
 
-from zotify.logger import Logger
+from logger import Logger
 
 
 class Loader:

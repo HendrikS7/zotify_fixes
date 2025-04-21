@@ -10,8 +10,8 @@ from librespot.util import bytes_to_hex, hex_to_bytes
 from requests import get
 from tqdm import tqdm
 
-from zotify.file import LocalFile
-from zotify.utils import (
+from file import LocalFile
+from utils import (
     AudioFormat,
     ImageSize,
     MetadataEntry,

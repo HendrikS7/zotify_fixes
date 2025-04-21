@@ -5,7 +5,7 @@ from subprocess import PIPE, Popen
 from music_tag import load_file
 from mutagen.oggvorbis import OggVorbisHeaderError
 
-from zotify.utils import AudioFormat, MetadataEntry, Quality
+from utils import AudioFormat, MetadataEntry, Quality
 
 
 class TranscodingError(RuntimeError): ...

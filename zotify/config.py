@@ -5,7 +5,7 @@ from pathlib import Path
 from sys import platform as PLATFORM
 from typing import Any
 
-from zotify.utils import AudioFormat, ImageSize, Quality
+from utils import AudioFormat, ImageSize, Quality
 
 ALBUM_LIBRARY = "album_library"
 ALL_ARTISTS = "all_artists"

@@ -3,7 +3,7 @@ from sys import stderr
 
 from tqdm import tqdm
 
-from zotify.config import (
+from config import (
     PRINT_DOWNLOADS,
     PRINT_ERRORS,
     PRINT_PROGRESS,

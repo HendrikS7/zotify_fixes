@@ -3,9 +3,9 @@
 from argparse import ArgumentParser
 from pathlib import Path
 
-from zotify.app import App
-from zotify.config import CONFIG_PATHS, CONFIG_VALUES
-from zotify.utils import OptionalOrFalse
+from app import App
+from config import CONFIG_PATHS, CONFIG_VALUES
+from utils import OptionalOrFalse
 
 VERSION = "1.1.2"
 

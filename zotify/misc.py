@@ -37,10 +37,10 @@ from librespot.crypto import Packet
 from pkce import generate_code_verifier, get_code_challenge
 from requests import HTTPError, get, post
 
-from zotify.loader import Loader
-from zotify.playable import Episode, Track
-from zotify.utils import Quality, RateLimitMode
-from zotify.agents import USER_AGENTS
+from loader import Loader
+from playable import Episode, Track
+from utils import Quality, RateLimitMode
+from agents import USER_AGENTS
 
 API_URL = "https://api.sp" + "otify.com/v1/"
 AUTH_URL = "https://accounts.sp" + "otify.com/"
