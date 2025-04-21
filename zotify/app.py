@@ -208,6 +208,10 @@ class App:
         Logger(self.__config)
 
         # Create session
+
+        print("If login is not working use one more time the method in the else case.")
+        assert " " not in str(self.__config.credentials_path), "credentials_path must not contain spaces"
+
         if args.username != "" and args.token != "":
             oauth = OAuth(args.username)
             oauth.set_token(args.token, OAuth.RequestType.REFRESH)
