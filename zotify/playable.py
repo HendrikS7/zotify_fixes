@@ -122,9 +122,8 @@ class Playable:
         with open(spotid_file, "a", encoding="utf-8") as f:
             f.write(f"{spotid}\n")
 
-        output = f"{output}.{ext}"
         file_path = library.joinpath(output).expanduser()
-        check_path = Path(file_path)
+        check_path = Path(f"{file_path}.{ext}")
         if check_path.exists():
             print("File exists. TODO: check if spotid is the same")
             raise FileExistsError("File already downloaded")
