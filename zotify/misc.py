@@ -155,6 +155,7 @@ class Session(LibrespotSession):
             if not isinstance(save_file, Path):
                 save_file = Path(save_file).expanduser()
             save_file.parent.mkdir(parents=True, exist_ok=True)
+            config.set_store_credentials(True)
             config.set_stored_credential_file(str(save_file))
         else:
             config.set_store_credentials(False)
