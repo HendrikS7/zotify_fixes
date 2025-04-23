@@ -343,7 +343,7 @@ class App:
     def download_all(self, collections: list[Collection]) -> None:
         count = 0
         total = sum(len(c.playables) for c in collections)
-        for collection in collections:
+        for collection in list(reversed(collections)):
             if self.__config.create_playlist_file and not isinstance(
                 collection, (Track, Episode)
             ):
@@ -361,7 +361,7 @@ class App:
                 with open(playlist_file, "w", encoding="utf-8") as f:
                     f.write("#EXTM3U\n")
 
-            for playable in collection.playables:
+            for playable in list(reversed(collection.playables)):
                 count += 1
 
                 # Skip duplicates and previously downloaded
