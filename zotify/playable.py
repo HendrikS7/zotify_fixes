@@ -113,6 +113,8 @@ class Playable:
 
             if meta.name == "spotid":
                 spotid = meta.string
+            if meta.name == "title":
+                title = meta.string
 
         if spotid_exists(library, spotid):
             print("Spotid already exists in all_spotids.txt")
@@ -141,8 +143,17 @@ class Playable:
             #     if not replace:
             #         raise FileExistsError("File already downloaded")
         else:
-            print(f"File does not exist: {check_path}")
-            file_path.parent.mkdir(parents=True, exist_ok=True)
+            # Check if a file with the same title and extension already exists
+            # This is to avoid duplicates like:
+            # Klangkarussell, LissA - Sight Of You (Read the News Remix)
+            # Klangkarussell, LissA, Read the News - Sight Of You (Read the News Remix)
+            file_path_with_artits_wildcard = library.glob(f"*{title}*.{ext}")
+            for existing_file in file_path_with_artits_wildcard:
+                print(f"Similar File exists: {existing_file}")
+                raise FileExistsError("File already downloaded")
+
+        print(f"File does not exist: {check_path}")
+        file_path.parent.mkdir(parents=True, exist_ok=True)
 
         return file_path
 
