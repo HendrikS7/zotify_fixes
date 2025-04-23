@@ -9,6 +9,12 @@ from file import TranscodingError
 from loader import Loader
 from logger import LogChannel, Logger
 from utils import AudioFormat, PlayableType
+import librespot
+
+import requests
+import json
+import time
+
 
 class ParseError(ValueError): ...
 
@@ -198,7 +204,14 @@ class Selection:
                 get_next = "y"
 
         return get_next
+    
+class TrackInfo:
+    def __init__(self, artists: str, title: str):
+        self.artists = artists
+        self.title = title
 
+    def __str__(self):
+        return f"TrackInfo: {self.artists} - {self.title}"
 
 class App:
     def __init__(self, args: Namespace):
@@ -234,6 +247,13 @@ class App:
                 oauth, self.__config.credentials_path, self.__config.language
             )
 
+        if self.__config.credentials_path.is_file():
+            print("Setup session")
+            conf = librespot.core.Session.Configuration.Builder().set_store_credentials(False).build()
+            self.SESSION = librespot.core.Session.Builder(conf).stored_file(self.__config.credentials_path).create()
+        else:
+            print("self.SESSION is None")
+
         # Get items to download
         ids = self.get_selection(args)
         with Loader("Parsing input..."):
@@ -249,6 +269,91 @@ class App:
         else:
             Logger.log(LogChannel.WARNINGS, "there is nothing to do")
         exit(0)
+
+
+    def __get_auth_token(cls):
+        USER_READ_EMAIL = 'user-read-email'
+        USER_FOLLOW_READ = 'user-follow-read'
+        PLAYLIST_READ_PRIVATE = 'playlist-read-private'
+        USER_LIBRARY_READ = 'user-library-read'
+        return cls.SESSION.tokens().get_token(
+            USER_READ_EMAIL, PLAYLIST_READ_PRIVATE, USER_LIBRARY_READ, USER_FOLLOW_READ
+        ).access_token
+
+    def get_auth_header(cls):
+        return {
+            'Authorization': f'Bearer {cls.__get_auth_token()}',
+            'Accept-Language': f'{cls.__config.language}',
+            'Accept': 'application/json',
+            'app-platform': 'WebPlayer'
+        }
+    
+    def invoke_url(self, url, tryCount=0):
+        # we need to import that here, otherwise we will get circular imports!
+        # from termoutput import Printer, PrintChannel
+        headers = self.get_auth_header()
+        response = requests.get(url, headers=headers)
+        responsetext = response.text
+        try:
+            responsejson = response.json()
+        except json.decoder.JSONDecodeError:
+            responsejson = {"error": {"status": "unknown", "message": "received an empty response"}}
+
+        get_retry_attempts = 10
+        if not responsejson or 'error' in responsejson:
+            if tryCount < (get_retry_attempts - 1):
+                print("errorororororo")
+                # Printer.print(PrintChannel.WARNINGS, f"Spotify API Error (try {tryCount + 1}) ({responsejson['error']['status']}): {responsejson['error']['message']}")
+                time.sleep(5)
+                return self.invoke_url(url, tryCount + 1)
+
+
+            print("errorororororo22")
+            # Printer.print(PrintChannel.API_ERRORS, f"Spotify API Error ({responsejson['error']['status']}): {responsejson['error']['message']}")
+
+        return responsetext, responsejson
+    
+    def get_track_info(self, song_id) -> TrackInfo:
+        """ Retrieves metadata for downloaded songs """
+        with Loader("Fetching track information..."):
+
+            TRACKS_URL = 'https://api.spotify.com/v1/tracks'
+            (raw, info) = self.invoke_url(f'{TRACKS_URL}?ids={song_id}&market=from_token')
+
+        TRACKS = 'tracks'
+        ARTISTS = 'artists'
+        NAME = 'name'
+        if not TRACKS in info:
+            raise ValueError(f'Invalid response from TRACKS_URL:\n{raw}')
+
+        print("got track info")
+        try:
+            artists = []
+            for data in info[TRACKS][0][ARTISTS]:
+                artists.append(data[NAME])
+
+            all_artists = ", ".join(artists)
+
+            # album_name = info[TRACKS][0][ALBUM][NAME]
+            name = info[TRACKS][0][NAME]
+            # release_year = info[TRACKS][0][ALBUM][RELEASE_DATE].split('-')[0]
+            # disc_number = info[TRACKS][0][DISC_NUMBER]
+            # track_number = info[TRACKS][0][TRACK_NUMBER]
+            # scraped_song_id = info[TRACKS][0][ID]
+            # is_playable = info[TRACKS][0][IS_PLAYABLE]
+            # duration_ms = info[TRACKS][0][DURATION_MS]
+
+            # image = info[TRACKS][0][ALBUM][IMAGES][0]
+            # for i in info[TRACKS][0][ALBUM][IMAGES]:
+            #     if i[WIDTH] > image[WIDTH]:
+            #         image = i
+            # image_url = image[URL]
+
+            return TrackInfo(all_artists, name)
+
+            # return artists, info[TRACKS][0][ARTISTS], album_name, name, image_url, release_year, disc_number, track_number, scraped_song_id, is_playable, duration_ms
+        except Exception as e:
+            raise ValueError(f'Failed to parse TRACKS_URL response: {str(e)}\n{raw}')
 
     def get_selection(self, args: Namespace) -> list[str]:
         selection = Selection(self.__session)
@@ -363,6 +468,14 @@ class App:
 
             for playable in list(reversed(collection.playables)):
                 count += 1
+
+                track_info = self.get_track_info(playable.id)
+                print(track_info)
+                full_track_path = Path(playable.library) / f"{track_info.artists} - {track_info.title}.{self.__config.audio_format.value.ext}"
+                print(f"full_track_path: {full_track_path}")
+                if full_track_path.is_file():
+                    print(f"File already exists: {full_track_path}")
+                    continue
 
                 # Skip duplicates and previously downloaded
                 if playable.duplicate:
