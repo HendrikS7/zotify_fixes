@@ -141,6 +141,7 @@ class Playable:
             #     if not replace:
             #         raise FileExistsError("File already downloaded")
         else:
+            print(f"File does not exist: {check_path}")
             file_path.parent.mkdir(parents=True, exist_ok=True)
 
         return file_path
