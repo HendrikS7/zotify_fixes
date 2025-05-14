@@ -9,6 +9,8 @@ from file import TranscodingError
 from loader import Loader
 from logger import LogChannel, Logger
 from utils import AudioFormat, PlayableType
+from playable import add_to_spotids_file
+
 import librespot
 
 import requests
@@ -529,7 +531,7 @@ class App:
                     except AttributeError:
                         pass  # Episode
                 try:
-                    output = track.create_output(
+                    output, spotid, full_track_name = track.create_output(
                         self.__config.audio_format.value.ext,
                         playable.library,
                         playable.output_template,
@@ -598,6 +600,8 @@ class App:
 
                 # Remove temp filename
                 file.clean_filename()
+
+                add_to_spotids_file(playable.library, spotid, full_track_name)
 
                 # Reset rate limit counter for every successful download
                 self.__session.rate_limiter.clear_consec_hits()

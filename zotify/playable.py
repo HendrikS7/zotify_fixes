@@ -57,6 +57,11 @@ class Lyrics:
                 f.writelines(self.__lines[:-1])
 
 
+def add_to_spotids_file(directory: Path, spotid: str, full_track_name: str) -> None:
+    spotid_file = directory / "all_spotids.txt"
+    with open(spotid_file, "a", encoding="utf-8") as f:
+        f.write(f"{spotid} - {full_track_name}\n")
+
 def spotid_exists(directory: Path | str, spotid: str) -> bool:
     """
     Checks if a file with the same spotid already exists in the directory
@@ -120,14 +125,12 @@ class Playable:
             print("Spotid already exists in all_spotids.txt")
             raise FileExistsError("Spotid already downloaded")
         
-        spotid_file = library / "all_spotids.txt"
-        with open(spotid_file, "a", encoding="utf-8") as f:
-            f.write(f"{spotid}\n")
 
         file_path = library.joinpath(output).expanduser()
         check_path = Path(f"{file_path}.{ext}")
         if check_path.exists():
             print("File exists. TODO: check if spotid is the same")
+            add_to_spotids_file(library, spotid, output)
             raise FileExistsError("File already downloaded")
             # f = LocalFile(check_path)
             # f_spotid = None
@@ -150,12 +153,13 @@ class Playable:
             file_path_with_artits_wildcard = library.glob(f"*{title}*.{ext}")
             for existing_file in file_path_with_artits_wildcard:
                 print(f"Similar File exists: {existing_file}")
+                add_to_spotids_file(library, spotid, output)
                 raise FileExistsError("File already downloaded")
 
         print(f"File does not exist: {check_path}")
         file_path.parent.mkdir(parents=True, exist_ok=True)
 
-        return file_path
+        return file_path, spotid, output
 
     def write_audio_stream(
         self,
