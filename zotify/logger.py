@@ -36,7 +36,8 @@ class Logger:
             channel: LogChannel to print to
             msg: Message to log
         """
-        if cls.__config.get(channel.value):
+        # if cls.__config.get(channel.value):
+        if True:
             if channel == LogChannel.ERRORS:
                 print(msg, file=stderr)
             else:
