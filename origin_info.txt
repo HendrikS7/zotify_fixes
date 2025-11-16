@@ -1,0 +1,2 @@
+https://github.com/DraftKinner/zotify.git
+# added as second remote: git remote add original_origin https://github.com/DraftKinner/zotify.git
