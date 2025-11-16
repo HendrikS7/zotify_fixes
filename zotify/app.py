@@ -228,17 +228,20 @@ class App:
         assert " " not in str(self.__config.credentials_path), "credentials_path must not contain spaces"
 
         if args.username != "" and args.token != "":
+            print("Setup session from username and token")
             oauth = OAuth(args.username)
             oauth.set_token(args.token, OAuth.RequestType.REFRESH)
             self.__session = Session.from_oauth(
                 oauth, self.__config.credentials_path, self.__config.language
             )
         elif self.__config.credentials_path.is_file():
+            print("Setup session from existing credentials file")
             self.__session = Session.from_file(
                 self.__config.credentials_path,
                 self.__config.language,
             )
         else:
+            print("Setup session from interactive login")
             username = args.username
             while username == "":
                 username = input("Username: ")
